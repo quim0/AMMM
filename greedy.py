@@ -175,9 +175,9 @@ if __name__ == "__main__":
     """
 
     types = [
-        LogisticCenterType(0, 18, 2, 50),
-        LogisticCenterType(1, 14, 4, 45),
-        LogisticCenterType(2, 5, 7, 15)
+        LogisticCenterType(1, 18, 2, 50),
+        LogisticCenterType(2, 14, 4, 45),
+        LogisticCenterType(3, 5, 7, 15)
     ]
 
     d_center = 1.2
@@ -190,3 +190,10 @@ if __name__ == "__main__":
         print(f"City {idx} ({c.x, c.y}):")
         print(f"\tPrimary center: ({c.pc.x}, {c.pc.y}) of type {c.pc.t.tid}")
         print(f"\tSecondary center: ({c.sc.x}, {c.sc.y}) of type {c.sc.t.tid}")
+
+    total_cost = 0
+    for idx, cn in enumerate(centers):
+        if cn.active:
+            print("Location %d, has a center of type %d." % (idx+1, cn.t.tid))
+            total_cost += cn.cost
+    print("Total cost: %d" % total_cost)
