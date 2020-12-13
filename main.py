@@ -4,6 +4,7 @@ from models import (CapacityExceeded, CenterTooFar, CenterTooClose,
 
 from localsearch import LocalSearchSolver
 from greedy import GreedySolver
+from grasp import GRASPSolver
 from data import cities, centers, types, d_center
 
 import argparse
@@ -27,6 +28,16 @@ def run_localsearch(initial_solution):
     print(solution)
     return solution
 
+def run_grasp(initial_solution):
+    print("----- RUNNING GRASP -----")
+
+    gs = GRASPSolver(initial_solution, d_center)
+    solution = gs.solve()
+
+    print("----- GRASP RESULTS -----")
+    print(solution)
+    return solution
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Heuristics for AMMM final project")
     parser.add_argument(
@@ -45,4 +56,5 @@ if __name__ == "__main__":
         run_localsearch(greedy_solution)
 
     if args.algorithm == "grasp":
-        raise NotImplementedError
+        grasp_solution = run_grasp(initial_solution)
+        run_localsearch(grasp_solution)

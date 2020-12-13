@@ -170,7 +170,7 @@ class Solution:
     @property
     def cost(self):
         total_cost = 0
-        for l in centers:
+        for l in self.centers:
             if l.active:
                 total_cost += l.cost
         return total_cost
