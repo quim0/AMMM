@@ -67,7 +67,7 @@ class GreedySolver:
                         l.check_city_primary(c)
                     else:
                         l.check_city_secondary(c)
-                    l.active = None
+                    l.active = False
                     return t.cost
 
                 except CenterTooClose:
