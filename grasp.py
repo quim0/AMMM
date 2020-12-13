@@ -69,6 +69,10 @@ class GRASPSolver:
             ordered_types = sorted(self.types, key=lambda x: x.cost)
             for t in ordered_types:
                 try:
+                    if not primary and l.t is not None:
+                        # A primary center already put a type in this iteration
+                        continue
+
                     l.activate(self.centers, self.d_center)
                     l.t = t
                     if primary:
@@ -100,7 +104,7 @@ class GRASPSolver:
                         print(f"Infeasible center because too far from the city c({c.x}, {c.y}) -> l({l.x, l.y})")
                     raise Infeasible
 
-            if l.t == None:
+            if l.t is None:
                 if self.debug:
                     print(f"Infeasible new center because of capacity c({c.x}, {c.y}) -> l({l.x, l.y})")
                 raise Infeasible
@@ -111,12 +115,19 @@ class GRASPSolver:
         solutions = []
         alpha = 0
         for iter_idx in range(3):
+            good = True
             self.cities = copy.deepcopy(self.solution.cities)
             self.centers = copy.deepcopy(self.solution.centers)
             self.types = copy.deepcopy(self.solution.types)
             for c in self.cities:
                 costs_primary = []
                 costs_secondary = []
+
+                # "clean" types of not active centers from previous iterations
+                for l in self.centers:
+                    if not l.active:
+                        l.t = None
+
                 for l in self.centers:
                     try:
                         costs_primary.append(
@@ -160,10 +171,7 @@ class GRASPSolver:
                     primary_center_assigned.activate(self.centers, self.d_center)
 
                 # XXX
-                try:
-                    primary_center_assigned.add_city_primary(c)
-                except:
-                    continue
+                primary_center_assigned.add_city_primary(c)
 
                 qmin_secondary = sorted_costs_s_raw[0][1]
                 qmax_secondary = sorted_costs_s_raw[-1][1]
@@ -172,12 +180,11 @@ class GRASPSolver:
                     if x[1] <= (qmin_secondary + alpha * (qmax_secondary - qmin_secondary))
                     ]
 
-
                 sc_idx = random.randint(0, len(sorted_costs_p) - 1)
                 sc_found = False
-                for i in range(len(sorted_costs_s)):
+                for i in range(len(sorted_costs_s_raw)):
                     secondary_center_assigned = \
-                        sorted_costs_s[(sc_idx + i) % len(sorted_costs_s)][0]
+                        sorted_costs_s_raw[(sc_idx + i) % len(sorted_costs_s_raw)][0]
                     activated = False
                     try:
                         if not secondary_center_assigned.active:
@@ -199,12 +206,14 @@ class GRASPSolver:
 
                 if not sc_found:
                     print(f"Not feasible secondary center for city {c.coordinates}")
+                    good = False
 
                 print(f"City ({c.x}, {c.y}) assigned SC at ({secondary_center_assigned.x},"
                       f" {secondary_center_assigned.y}). Type {secondary_center_assigned.t.tid}")
 
-            print(f"End of iteration {iter_idx} with alpha {alpha}")
-            solutions.append(Solution(self.cities, self.centers, self.types))
+            if good:
+                print(f"End of iteration {iter_idx} with alpha {alpha}")
+                solutions.append(Solution(self.cities, self.centers, self.types))
             alpha += 0.1
 
         min_cost = float("inf")
