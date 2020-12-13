@@ -61,7 +61,7 @@ class LogisticCenterLocation:
 
     def activate(self, locations, d_center):
         for l in locations:
-            if l.active and (distance(self.coordinates, l.coordinates) > d_center):
+            if l.active and (distance(self.coordinates, l.coordinates) < d_center):
                 raise CenterTooClose
 
         self.active = True

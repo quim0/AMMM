@@ -10,8 +10,8 @@ class LocalSearchSolver:
         self.d_center = d_center
 
     def solve(self):
-        out = False
-        while not out:
+        iterations = 5
+        while iterations > 0:
             for idx, l in enumerate(self.centers):
                 if not l.active:
                     continue
@@ -38,7 +38,6 @@ class LocalSearchSolver:
                             if l == l2 or not l2.active:
                                 continue
                             try:
-                                # TODO: Do more iterations?
                                 # Remove the city from the old logistic center
                                 # (l) and add it to the new (l2). Update the old
                                 # logistic center type
@@ -58,7 +57,6 @@ class LocalSearchSolver:
                                     x for x in l.cities_primary if x != c
                                     ]
                                 self.centers[idx].t = next_t
-                                out = True
                                 break
 
                             except CenterTooFar:
@@ -93,7 +91,6 @@ class LocalSearchSolver:
                             if l == l2 or not l2.active:
                                 continue
                             try:
-                                # TODO: Do more iterations?
                                 # Remove the city from the old logistic center
                                 # (l) and add it to the new (l2). Update the old
                                 # logistic center type
@@ -113,10 +110,12 @@ class LocalSearchSolver:
                                     x for x in l.cities_secondary if x != c
                                     ]
                                 self.centers[idx].t = next_t
-                                out = True
                                 break
 
                             except CenterTooFar:
                                 continue
                             except CapacityExceeded:
                                 continue
+                            except AlreadyPrimaryCenter:
+                                continue
+            iterations -= 1
