@@ -3,11 +3,12 @@ from models import (CapacityExceeded, CenterTooFar, CenterTooClose,
                     AlreadyPrimaryCenter, Infeasible)
 
 class GreedySolver:
-    def __init__(self, cities, centers, types, d_center):
+    def __init__(self, cities, centers, types, d_center, debug=False):
         self.cities = cities
         self.centers = centers
         self.types = types
         self.d_center = d_center
+        self.debug = debug
 
     def cost_and_update(self, c, l, primary=True):
         # Returns cost increment
@@ -43,15 +44,18 @@ class GreedySolver:
 
                 if l.t.tid == initial_type.tid:
                     # No feasible new center type
-                    # print(f"Infeasible center because capacity c({c.x}, {c.y}) -> l({l.x, l.y})")
+                    if self.debug:
+                        print(f"Infeasible center because capacity c({c.x}, {c.y}) -> l({l.x, l.y})")
                     raise Infeasible
 
             except CenterTooFar:
-                # print(f"Infeasible center because too far c({c.x}, {c.y}) -> l({l.x, l.y})")
+                if self.debug:
+                    print(f"Infeasible center because too far c({c.x}, {c.y}) -> l({l.x, l.y})")
                 raise Infeasible
 
             except AlreadyPrimaryCenter:
-                # print(f"Infeasible center because already primary c({c.x}, {c.y}) -> l({l.x, l.y})")
+                if self.debug:
+                    print(f"Infeasible center because already primary c({c.x}, {c.y}) -> l({l.x, l.y})")
                 # Secondary and primary centers must be different
                 raise Infeasible
 
@@ -74,7 +78,8 @@ class GreedySolver:
                     # d_center not satisfied
                     l.t = None
                     l.active = False
-                    # print(f"Infeasible center because too close to another center c({c.x}, {c.y}) -> l({l.x, l.y})")
+                    if self.debug:
+                        print(f"Infeasible center because too close to another center c({c.x}, {c.y}) -> l({l.x, l.y})")
                     raise Infeasible
 
                 except CapacityExceeded:
@@ -87,11 +92,13 @@ class GreedySolver:
                     # Center is too far from the city
                     l.t = None
                     l.active = False
-                    # print(f"Infeasible center because too far from the city c({c.x}, {c.y}) -> l({l.x, l.y})")
+                    if self.debug:
+                        print(f"Infeasible center because too far from the city c({c.x}, {c.y}) -> l({l.x, l.y})")
                     raise Infeasible
 
             if l.t == None:
-                # print(f"Infeasible new center because of capacity c({c.x}, {c.y}) -> l({l.x, l.y})")
+                if self.debug:
+                    print(f"Infeasible new center because of capacity c({c.x}, {c.y}) -> l({l.x, l.y})")
                 raise Infeasible
             else:
                 return l.cost
