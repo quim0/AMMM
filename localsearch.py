@@ -1,6 +1,6 @@
 from models import City, LogisticCenterLocation, LogisticCenterType, Solution
 from models import (CapacityExceeded, CenterTooFar, CenterTooClose,
-                    AlreadyPrimaryCenter, Infeasible)
+                    AlreadyPrimaryCenter, AlreadySecondaryCenter, Infeasible)
 
 class LocalSearchSolver:
     def __init__(self, solution, d_center):
@@ -62,6 +62,8 @@ class LocalSearchSolver:
                             except CenterTooFar:
                                 continue
                             except CapacityExceeded:
+                                continue
+                            except AlreadySecondaryCenter:
                                 continue
 
             # Same but with secondary cities

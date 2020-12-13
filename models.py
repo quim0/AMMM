@@ -18,6 +18,9 @@ class CenterTooClose(Exception):
 class AlreadyPrimaryCenter(Exception):
     pass
 
+class AlreadySecondaryCenter(Exception):
+    pass
+
 class Infeasible(Exception):
     pass
 
@@ -118,6 +121,8 @@ class LogisticCenterLocation:
         return True
 
     def add_city_primary(self, city):
+        if self.is_secondary(city.x, city.y):
+            raise AlreadySecondaryCenter
         if (distance(self.coordinates, city.coordinates) > self.t.working_d):
             raise CenterTooFar
         if (self.next_load_with_city_primary(city) > self.t.cap):
