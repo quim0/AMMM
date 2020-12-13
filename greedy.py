@@ -65,6 +65,8 @@ class GreedySolver:
             ordered_types = sorted(self.types, key=lambda x: x.cost)
             for t in ordered_types:
                 try:
+                    if not primary and l.t is not None:
+                        continue
                     l.activate(self.centers, self.d_center)
                     l.t = t
                     if primary:
@@ -96,7 +98,7 @@ class GreedySolver:
                         print(f"Infeasible center because too far from the city c({c.x}, {c.y}) -> l({l.x, l.y})")
                     raise Infeasible
 
-            if l.t == None:
+            if l.t is None:
                 if self.debug:
                     print(f"Infeasible new center because of capacity c({c.x}, {c.y}) -> l({l.x, l.y})")
                 raise Infeasible
@@ -107,6 +109,12 @@ class GreedySolver:
         for c in self.cities:
             costs_primary = []
             costs_secondary = []
+
+            # "clean" old type assignation
+            for l in self.centers:
+                if not l.active:
+                    l.t = None
+
             for l in self.centers:
                 try:
                     costs_primary.append(
