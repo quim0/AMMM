@@ -1,12 +1,12 @@
-from models import City, LogisticCenterLocation, LogisticCenterType
+from models import City, LogisticCenterLocation, LogisticCenterType, Solution
 from models import (CapacityExceeded, CenterTooFar, CenterTooClose,
                     AlreadyPrimaryCenter, Infeasible)
 
 class LocalSearchSolver:
-    def __init__(self, cities, centers, types, d_center):
-        self.cities = cities
-        self.centers = centers
-        self.types = sorted(types, key=lambda x: x.cost)
+    def __init__(self, solution, d_center):
+        self.cities = solution.cities
+        self.centers = solution.centers
+        self.types = sorted(solution.types, key=lambda x: x.cost)
         self.d_center = d_center
 
     def solve(self):
@@ -119,3 +119,4 @@ class LocalSearchSolver:
                             except AlreadyPrimaryCenter:
                                 continue
             iterations -= 1
+        return Solution(self.cities, self.centers, self.types)

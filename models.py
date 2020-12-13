@@ -1,4 +1,6 @@
 import math
+import io
+import copy
 
 def distance(a, b):
     return math.sqrt(math.pow((a[0] - b[0]), 2) + math.pow((a[1] - b[1]), 2))
@@ -158,3 +160,36 @@ class LogisticCenterType:
 
     def __eq__(self, other):
         return self.tid == other.tid
+
+class Solution:
+    def __init__(self, cities, centers, types):
+        self.cities = copy.deepcopy(cities)
+        self.centers = copy.deepcopy(centers)
+        self.types = copy.deepcopy(types)
+
+    @property
+    def cost(self):
+        total_cost = 0
+        for l in centers:
+            if l.active:
+                total_cost += l.cost
+        return total_cost
+
+    def __str__(self):
+        str_buf = io.StringIO()
+        for idx, c in enumerate(self.cities):
+            str_buf.write(f"City {idx} {c.x, c.y}:\n")
+            str_buf.write(f"\tPrimary center: ({c.pc.x}, {c.pc.y}) of type "
+                          f"{c.pc.t.tid}\n")
+            str_buf.write(f"\tSecondary center: ({c.sc.x}, {c.sc.y}) of type "
+                          f"{c.sc.t.tid}\n")
+
+        total_cost = 0
+        for idx, l in enumerate(self.centers):
+            if l.active:
+                str_buf.write(
+                    f"Location {idx}, has a center of type {l.t.tid}.\n"
+                    )
+                total_cost += l.cost
+        str_buf.write(f"Total cost: {total_cost}\n")
+        return str_buf.getvalue()

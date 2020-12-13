@@ -1,12 +1,12 @@
-from models import City, LogisticCenterLocation, LogisticCenterType
+from models import City, LogisticCenterLocation, LogisticCenterType, Solution
 from models import (CapacityExceeded, CenterTooFar, CenterTooClose,
                     AlreadyPrimaryCenter, Infeasible)
 
 class GreedySolver:
-    def __init__(self, cities, centers, types, d_center, debug=False):
-        self.cities = cities
-        self.centers = centers
-        self.types = types
+    def __init__(self, solution, d_center, debug=False):
+        self.cities = solution.cities
+        self.centers = solution.centers
+        self.types = solution.types
         self.d_center = d_center
         self.debug = debug
 
@@ -159,3 +159,4 @@ class GreedySolver:
             print(f"City ({c.x}, {c.y}) assigned SC at ({secondary_center_assigned.x},"
                   f" {secondary_center_assigned.y}). Type {secondary_center_assigned.t.tid}")
 
+        return Solution(self.cities, self.centers, self.types)

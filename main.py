@@ -1,3 +1,4 @@
+from models import Solution
 from models import (CapacityExceeded, CenterTooFar, CenterTooClose,
                     AlreadyPrimaryCenter, Infeasible)
 
@@ -7,43 +8,24 @@ from data import cities, centers, types, d_center
 
 import argparse
 
-def run_greedy():
+def run_greedy(initial_solution):
     print("----- RUNNING GREEDY -----")
-    gs = GreedySolver(cities, centers, types, d_center)
-    gs.solve()
+    gs = GreedySolver(initial_solution, d_center)
+    solution = gs.solve()
 
     print("----- GREEDY RESULTS -----")
-    for idx, c in enumerate(cities):
-        print(f"City {idx} {c.x, c.y}:")
-        print(f"\tPrimary center: ({c.pc.x}, {c.pc.y}) of type {c.pc.t.tid}")
-        print(f"\tSecondary center: ({c.sc.x}, {c.sc.y}) of type {c.sc.t.tid}")
+    print(solution)
+    return solution
 
-    total_cost = 0
-    for idx, cn in enumerate(centers):
-        if cn.active:
-            print("Location %d, has a center of type %d." % (idx+1, cn.t.tid))
-            total_cost += cn.cost
-    print("Total cost: %d" % total_cost)
-
-def run_localsearch():
+def run_localsearch(initial_solution):
     print("----- RUNNING LOCAL SEARCH -----")
 
-    lss = LocalSearchSolver(cities, centers, types, d_center)
-    lss.solve()
+    lss = LocalSearchSolver(initial_solution, d_center)
+    solution = lss.solve()
 
     print("----- LOCAL SEARCH RESULTS -----")
-    for idx, c in enumerate(cities):
-        print(f"City {idx} {c.x, c.y}:")
-        print(f"\tPrimary center: ({c.pc.x}, {c.pc.y}) of type {c.pc.t.tid}")
-        print(f"\tSecondary center: ({c.sc.x}, {c.sc.y}) of type {c.sc.t.tid}")
-
-    total_cost = 0
-    for idx, cn in enumerate(centers):
-        if cn.active:
-            print("Location %d, has a center of type %d." % (idx+1, cn.t.tid))
-            total_cost += cn.cost
-    print("Total cost: %d" % total_cost)
-
+    print(solution)
+    return solution
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Heuristics for AMMM final project")
@@ -53,12 +35,14 @@ if __name__ == "__main__":
         )
     args = parser.parse_args()
 
+    initial_solution = Solution(cities, centers, types)
+
     if args.algorithm == "greedy":
-        run_greedy()
+        run_greedy(initial_solution)
 
     if args.algorithm == "localsearch":
-        run_greedy()
-        run_localsearch()
+        greedy_solution = run_greedy(initial_solution)
+        run_localsearch(greedy_solution)
 
     if args.algorithm == "grasp":
         raise NotImplementedError
