@@ -33,6 +33,9 @@ class City:
     def coordinates(self):
         return (self.x, self.y)
 
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
 class LogisticCenterLocation:
     def __init__(self, x, y, t=None):
         self.x = x
@@ -68,11 +71,22 @@ class LogisticCenterLocation:
             [x.population for x in self.cities_primary] + [city.population]
             ) + 0.1 * sum([x.population for x in self.cities_secondary])
 
+    def next_load_without_city_primary(self, city):
+        return sum(
+            [x.population for x in self.cities_primary]) - city.population \
+             + 0.1 * sum([x.population for x in self.cities_secondary])
+
     def next_load_with_city_secondary(self, city):
         return sum([x.population for x in self.cities_primary]) + 0.1 * sum(
                         [x.population for x in self.cities_secondary] 
                         + [city.population]
                         )
+
+    def next_load_without_city_secondary(self, city):
+        return sum([x.population for x in self.cities_primary]) \
+               + 0.1 * sum([x.population for x in self.cities_secondary]) \
+                        - city.population
+
     def is_primary(self, x, y):
         for c in self.cities_primary:
             if c.x == x and c.y == y:
@@ -119,9 +133,28 @@ class LogisticCenterLocation:
         self.cities_secondary.append(city)
         city.sc = self
 
+    def check_cost_improve(self, city, t, primary=True):
+        # Check if cost can be improve by removing city and assigning the center
+        # to type t.
+        if primary:
+            next_load = self.next_load_without_city_primary(city)
+        else:
+            next_load = self.next_load_without_city_secondary(city)
+
+        if t.cost < self.t.cost and t.cap >= next_load:
+            # Center can be downgraded without the city
+            return True
+        return False
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
 class LogisticCenterType:
     def __init__(self, tid, cap, working_d, cost):
         self.tid = tid
         self.cap = cap
         self.working_d = working_d
         self.cost = cost
+
+    def __eq__(self, other):
+        return self.tid == other.tid
